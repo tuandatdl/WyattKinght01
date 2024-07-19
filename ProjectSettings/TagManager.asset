@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BackGround
+    uniqueID: 2724700847
+    locked: 0
+  - name: MidGround
+    uniqueID: 470313893
+    locked: 0
+  - name: ForgeGround
+    uniqueID: 3130754327
+    locked: 0
+  - name: Player
+    uniqueID: 1406806451
+    locked: 0
