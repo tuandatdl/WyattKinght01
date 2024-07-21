@@ -12,6 +12,8 @@ public class Movenment : MonoBehaviour
     private const float groundCheckRadius = 0.2f; // Bán kính của vòng tròn kiểm tra mặt đất
     public float speed = 5f; //Toc do
     public float jumpForce = 10f; // Luc nhay
+    public float doubleJumpForce = 8f; // Lực nhảy đôi
+    private bool doubleJump;
     public float dashForce = 20f;
     public float dashDuration = 0.2f;
     //ham rieng tu
@@ -31,10 +33,16 @@ public class Movenment : MonoBehaviour
     void Update()
     {
        moveInput = Input.GetAxisRaw("Horizontal"); //Lay gia tri dau vao cua truc X (A/D),(</>)
+       
+       if(isGrounded && !Input.GetButton("Jump"))
+       {
+        doubleJump = false;
+       }
        //neu nhan nut jump nhan vat nhay
-       if(Input.GetButtonDown("Jump"))
+         if(Input.GetButtonDown("Jump") || doubleJump)
        {
          jump = true;
+         doubleJump = !doubleJump;
        }
        //nguoc lai
        else if(Input.GetButtonUp("Jump"))
@@ -47,10 +55,10 @@ public class Movenment : MonoBehaviour
     }
     void FixedUpdate()
     {
+        GroundCheck();
         Move(moveInput);
         Jump(jump);
         Dash();
-        GroundCheck();
     }
     //kiem tra mat dat co dung voi collider khac hay ko
         //2D collider co nam trong lop mat dat ko
@@ -82,7 +90,15 @@ public class Movenment : MonoBehaviour
             jumpFlag = false;
             // them luc nhảy 
             rb.AddForce(new Vector2(0f, jumpForce));
-        }
+        } 
+        else if (doubleJump)
+            {
+                // Đặt doubleJump thành false để ngăn chặn nhảy đôi lại
+                doubleJump = false;
+                // Thêm lực nhảy đôi
+                rb.velocity = new Vector2(rb.velocity.x, 0); // Reset velocity theo trục Y trước khi thêm lực nhảy
+                rb.AddForce(new Vector2(0f, doubleJumpForce), ForceMode2D.Impulse);
+            }
     }
     void Dash()
     {
