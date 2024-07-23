@@ -1,62 +1,67 @@
+﻿using System;
 using System.Collections;
 using UnityEngine;
 
 public abstract class Health : MonoBehaviour
 {
-    // Bien luu tru suc khoe hien tai
+    // Biến lưu trữ sức khỏe hiện tại
     [SerializeField] private int _currentHealth;
-    // Bien luu tru suc khoe toi da
+    // Biến lưu trữ sức khỏe tối đa
     private int maxHealth;
 
-    // Ham khoi tao, gan suc khoe hien tai bang suc khoe toi da
+    // Sự kiện khi sức khỏe thay đổi
+    public event Action<int, int> OnHealthChanged;
+
+    // Phương thức khởi tạo, gán sức khỏe hiện tại bằng sức khỏe tối đa
     protected virtual void Start()
     {
         CurrentHealth = MaxHealth;
     }
 
-    // Thuoc tinh de lay va set suc khoe hien tai
+    // Thuộc tính để lấy và set sức khỏe hiện tại
     public int CurrentHealth
     {
         get { return _currentHealth; }
         set
         {
-            // Gan gia tri suc khoe hien tai, khong qua maxHealth
+            // Gán giá trị sức khỏe hiện tại, không quá maxHealth
             _currentHealth = Mathf.Clamp(value, 0, maxHealth);
+            OnHealthChanged?.Invoke(_currentHealth, maxHealth); // Gọi sự kiện khi sức khỏe thay đổi
         }
     }
 
-    // Thuoc tinh de lay va set suc khoe toi da
+    // Thuộc tính để lấy và set sức khỏe tối đa
     public int MaxHealth
     {
         get { return maxHealth; }
         set { maxHealth = value; }
     }
 
-    // Ham xu ly khi bi tan cong, tru suc khoe va kiem tra xem da chet chua
+    // Phương thức xử lý khi bị tấn công, trừ sức khỏe và kiểm tra xem đã chết chưa
     public virtual void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
-        // Neu suc khoe hien tai <= 0, goi ham chet
+        // Nếu sức khỏe hiện tại <= 0, gọi hàm chết
         if (CurrentHealth <= 0)
         {
             Die();
         }
     }
 
-    // Ham abstract, phai duoc implement trong cac lop ke thua
+    // Phương thức abstract, phải được implement trong các lớp kế thừa
     protected abstract void Die();
 
-    // Ham thuc thi quy trinh chet, tat collider, dung velocity, va doi 5 giay truoc khi huy
+    // Phương thức thực thi quy trình chết, tắt collider, dừng velocity, và đợi 5 giây trước khi hủy
     protected IEnumerator DieRoutine()
     {
-        // Tat collider cua doi tuong
+        // Tắt collider của đối tượng
         GetComponent<Collider2D>().enabled = false;
-        // Dat velocity cua rigidbody ve 0
+        // Đặt velocity của rigidbody về 0
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-        // Chuyen doi tuong thanh Static, khong bi anh huong boi luc
+        // Chuyển đối tượng thành Static, không bị ảnh hưởng bởi lực
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
 
-        // Cho doi 5 giay truoc khi huy doi tuong
+        // Chờ đợi 5 giây trước khi hủy đối tượng
         yield return new WaitForSeconds(5);
         Destroy(gameObject);
     }

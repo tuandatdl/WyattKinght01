@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4393555687426446286}
   - component: {fileID: 730934264344381653}
   - component: {fileID: 5240449703290574535}
+  - component: {fileID: 5706076950468566727}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -208,6 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44293f772df1532438fc913b21390401, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _currentHealth: 0
   attackDamage: 2
   attackRange: {x: 3.4, y: 2}
   attackPoint: {fileID: 5367147675486883530}
@@ -219,6 +221,19 @@ MonoBehaviour:
   playerMaxHealth: 10
   attackCooldown: 1.1
   recoilForce: 7
+--- !u!114 &5706076950468566727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811081211036175054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15ce5f01bcc16534c8bff5a717f61527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillHeart: {fileID: 0}
 --- !u!1 &6881973128664689436
 GameObject:
   m_ObjectHideFlags: 0
