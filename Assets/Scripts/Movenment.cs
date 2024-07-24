@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection.Emit;
+using System.Security.Cryptography;
+using TreeEditor;
 using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
 using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
@@ -13,21 +15,15 @@ public class Movenment : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer; // LayerMask để xác định lớp nền
-    
-    [SerializeField] private Transform wallCheck;
-    [SerializeField] private LayerMask wallLayer;
-
     [SerializeField] private bool isGrounded = false;
 
-    bool isWallSliding;
-    private float wallSlidingSpeed = 2f;
-
-    bool isWallJumping;
-    private float wallJumpingDirection;
-    private float wallJumpingTime = 0.2f;
-    private float wallJumpingCounter;
-    private float wallJumpingDuration = 0.4f;
-    private Vector2 wallJumpingPower = new Vector2(8f, 16f);
+    [Header("Wall Jump")]
+    public float wallJumpTime = 0.2f;
+    public float wallSlideSpeed = 0.3f;
+    public float wallDistance = 0.5f;
+    bool isWallSliding = false;
+    RaycastHit2D WallCheckHit;
+    float jumpTime;
 
     public float speed = 5f; //Toc do
     public float jumpPower = 10f; // Luc nhay
@@ -65,33 +61,28 @@ public class Movenment : MonoBehaviour
     {
        moveInput = Input.GetAxisRaw("Horizontal"); //Lay gia tri dau vao cua truc X (A/D),(</>)
        UpdateAnimation();
-       
        GroundCheck();
-       WallSlide();
-       WallJump();
-       //Move(moveInput);
+       Move(moveInput);
        Jump();
        Dash();
-       if(!isWallJumping)
-       {
-          Flip();
-       }
+       Flip();
       
     }
      void FixedUpdate()
     {
-        if(!isWallJumping)
-        {
-            rb.velocity = new Vector2(moveInput * speed * 100 * Time.deltaTime, rb.velocity.y);
-        }
+        WallJump();   
     }
+
     //kiem tra mat dat co dung voi collider khac hay ko
         //2D collider co nam trong lop mat dat ko
         //neu co thi (isGrounded true) ko thi (isGrounded false)
     void GroundCheck()
     {
         // Giả sử ban đầu rằng nhân vật không chạm đất
-        isGrounded = false;
+        if(jumpTime < Time.time)
+        {
+            isGrounded = false;
+        }
         // sử dụng hàm Physics2D.OverlapCircleAll để kiểm tra xem có bất kỳ collider nào nằm trong vòng tròn kiểm tra mặt đất không
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius, groundLayer);
         if(colliders.Length > 0)
@@ -99,64 +90,42 @@ public class Movenment : MonoBehaviour
             isGrounded = true;
         }
     }
-
-    private bool IsWalled()
-    {
-        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
-    }
-    void WallSlide()
-    {
-        if(IsWalled() && !isGrounded && moveInput != 0f)
-        {
-            isWallSliding = true;
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
-        }
-        else
-        {
-            isWallSliding = false;
-        }
-    }
-    void WallJump()
-    {
-        if(isWallSliding)
-        {
-            isWallJumping = false;
-            wallJumpingDirection = -transform.localScale.x;
-            wallJumpingCounter = wallJumpingTime;
-
-            CancelInvoke(nameof(StopWallJumping));
-        }
-        else
-        {
-            wallJumpingCounter -= Time.deltaTime;
-        }
-        if(Input.GetButtonDown("Jump") && wallJumpingCounter > 0f)
-        {
-            isWallJumping = true;
-            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
-            wallJumpingCounter = 0f;
-
-            if(transform.localScale.x != wallJumpingDirection)
-            {
-                FacingRight = !FacingRight;
-                Vector3 localScale = transform.localScale;
-                localScale.x *= -1f;
-                transform.localScale = localScale;
-            }
-            Invoke(nameof(StopWallJumping), wallJumpingDuration);
-        }
-    }
-    private void StopWallJumping()
-    {
-        isWallJumping = false;
-    }
-
-   /* void Move(float direction)
+   
+    void Move(float direction)
     {
         float xVelocity = direction * speed * 100 * Time.fixedDeltaTime; //tinh van toc
         Vector2 newVelocity = new Vector2(xVelocity, rb.velocity.y);
         rb.velocity = newVelocity;
-    }*/
+    }
+    void WallJump()
+    {
+        if(FacingRight)
+        {
+            WallCheckHit = Physics2D.Raycast(transform.position, new Vector2(wallDistance, 0), wallDistance, groundLayer);
+        }
+        else
+        {
+            WallCheckHit = Physics2D.Raycast(transform.position, new Vector2(-wallDistance, 0), wallDistance, groundLayer);
+        }
+        if(WallCheckHit && !isGrounded && moveInput != 0)
+        {
+            isWallSliding = true;
+            jumpTime = Time.time + wallJumpTime;
+        }
+        else if (jumpTime < Time.time)
+        {
+            isWallSliding = false;
+        }
+        if(isWallSliding) 
+        {
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, wallSlideSpeed, float.MaxValue));
+            anim.SetBool("WallSliding", true); // Kích hoạt animation bám tường
+        }
+        else
+        {
+            anim.SetBool("WallSliding", false); // Tắt animation bám tường
+        }
+    }
     void Jump()
     {
         if(isGrounded)
@@ -181,7 +150,7 @@ public class Movenment : MonoBehaviour
         }
         if(Input.GetButtonDown("Jump")) 
         {
-            if(coyataTimeCounter > 0f && jumpBufferCounter > 0f && isGrounded || doubleJump)
+            if(coyataTimeCounter > 0f && jumpBufferCounter > 0f && isGrounded || doubleJump || isWallSliding && Input.GetButtonDown("Jump"))
             {
             rb.velocity = new Vector2(rb.velocity.x, jumpPower);
             doubleJump = !doubleJump;
@@ -193,24 +162,6 @@ public class Movenment : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
             coyataTimeCounter = 0f;
         }
-
-        /*if(jumpFlag && isGrounded)
-        {
-            // Đặt isGrounded thành false để ngăn chặn việc nhảy lại ngay lập tức
-            isGrounded = false;
-            // Đặt jumpFlag thành false để reset trạng thái nhảy
-            jumpFlag = false;
-            // them luc nhảy 
-            rb.AddForce(new Vector2(0f, jumpForce));
-        } 
-        else if (doubleJump)
-            {
-                // Đặt doubleJump thành false để ngăn chặn nhảy đôi lại
-                doubleJump = false;
-                // Thêm lực nhảy đôi
-                rb.velocity = new Vector2(rb.velocity.x, 0); // Reset velocity theo trục Y trước khi thêm lực nhảy
-                rb.AddForce(new Vector2(0f, doubleJumpForce), ForceMode2D.Impulse);
-            }*/
     }
     void Dash()
     {
@@ -279,18 +230,6 @@ public class Movenment : MonoBehaviour
             // Lấy lại thang đo mới cho player
             transform.localScale = localScale;
         }
-        //nhin ben trai 
-       /* if(FacingRight && direction < 0) 
-        {
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, 1);
-            FacingRight = false;
-        } */
-        //nhin ben phai
-        /*if(!FacingRight && direction > 0)
-        {
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, 1);
-            FacingRight = true;
-        }*/
     }
     void UpdateAnimation()
     {

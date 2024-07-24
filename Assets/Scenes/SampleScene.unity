@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 348075090}
   - component: {fileID: 348075089}
   - component: {fileID: 348075091}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -360,7 +360,7 @@ GameObject:
   - component: {fileID: 604429668}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -403,11 +403,10 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  wallCheck: {fileID: 1161439405}
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 192
   isGrounded: 0
+  wallJumpTime: 0.2
+  wallSlideSpeed: 0.3
+  wallDistance: 0.5
   speed: 4
   jumpPower: 15
   doubleJumpPower: 8
@@ -445,8 +444,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.011172856, y: 0.0026160716}
-  m_Size: {x: 0.27318513, y: 0.26750803}
+  m_Offset: {x: 0.0035580648, y: 0.001367483}
+  m_Size: {x: 0.14830258, y: 0.26501083}
   m_Direction: 0
 --- !u!50 &604429671
 Rigidbody2D:
@@ -463,7 +462,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 4
+  m_GravityScale: 5
   m_Material: {fileID: 6200000, guid: 05646c4594b4a42cc95e53019bf2ab1b, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -472,7 +471,7 @@ Rigidbody2D:
     serializedVersion: 2
     m_Bits: 0
   m_Interpolate: 1
-  m_SleepingMode: 1
+  m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!212 &604429672
@@ -541,7 +540,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1544312772}
-  - {fileID: 1161439405}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &882935863
@@ -557,7 +555,7 @@ GameObject:
   - component: {fileID: 882935866}
   - component: {fileID: 882935865}
   m_Layer: 6
-  m_Name: Square (2)
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -572,11 +570,11 @@ Transform:
   m_GameObject: {fileID: 882935863}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6067232, y: -4.7218933, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.1772, y: -4.11, z: 0}
+  m_LocalScale: {x: 13.778838, y: 0.94072425, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1808171160}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &882935865
 Rigidbody2D:
@@ -702,37 +700,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1161439404
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1161439405}
-  m_Layer: 0
-  m_Name: WallCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1161439405
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161439404}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.05, y: 0.035, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 604429673}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1544312771
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,7 +742,7 @@ GameObject:
   - component: {fileID: 1792542043}
   - component: {fileID: 1792542042}
   - component: {fileID: 1792542041}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Wall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -977,8 +944,7 @@ Transform:
   m_LocalPosition: {x: -3.8602, y: 0.262, z: 0}
   m_LocalScale: {x: 8.603924, y: 0.9407243, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 882935864}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1808171161
@@ -1060,5 +1026,6 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 604429673}
   - {fileID: 1808171160}
+  - {fileID: 882935864}
   - {fileID: 348075090}
   - {fileID: 1792542043}
