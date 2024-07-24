@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection.Emit;
 using Unity.Burst.Intrinsics;
+using Unity.VisualScripting;
 using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -11,7 +13,22 @@ public class Movenment : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer; // LayerMask để xác định lớp nền
+    
+    [SerializeField] private Transform wallCheck;
+    [SerializeField] private LayerMask wallLayer;
+
     [SerializeField] private bool isGrounded = false;
+
+    bool isWallSliding;
+    private float wallSlidingSpeed = 2f;
+
+    bool isWallJumping;
+    private float wallJumpingDirection;
+    private float wallJumpingTime = 0.2f;
+    private float wallJumpingCounter;
+    private float wallJumpingDuration = 0.4f;
+    private Vector2 wallJumpingPower = new Vector2(8f, 16f);
+
     public float speed = 5f; //Toc do
     public float jumpPower = 10f; // Luc nhay
     public float doubleJumpPower = 8f; // Lực nhảy đôi
@@ -41,26 +58,32 @@ public class Movenment : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-    }
-    void Start()
-    {
         dashCount = startDashCount;
     }
-
+   
     void Update()
     {
        moveInput = Input.GetAxisRaw("Horizontal"); //Lay gia tri dau vao cua truc X (A/D),(</>)
-       
        UpdateAnimation();
        
        GroundCheck();
-       Move(moveInput);
+       WallSlide();
+       WallJump();
+       //Move(moveInput);
        Jump();
        Dash();
-       Flip();
+       if(!isWallJumping)
+       {
+          Flip();
+       }
+      
     }
      void FixedUpdate()
     {
+        if(!isWallJumping)
+        {
+            rb.velocity = new Vector2(moveInput * speed * 100 * Time.deltaTime, rb.velocity.y);
+        }
     }
     //kiem tra mat dat co dung voi collider khac hay ko
         //2D collider co nam trong lop mat dat ko
@@ -76,12 +99,64 @@ public class Movenment : MonoBehaviour
             isGrounded = true;
         }
     }
-    void Move(float direction)
+
+    private bool IsWalled()
+    {
+        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+    }
+    void WallSlide()
+    {
+        if(IsWalled() && !isGrounded && moveInput != 0f)
+        {
+            isWallSliding = true;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+    }
+    void WallJump()
+    {
+        if(isWallSliding)
+        {
+            isWallJumping = false;
+            wallJumpingDirection = -transform.localScale.x;
+            wallJumpingCounter = wallJumpingTime;
+
+            CancelInvoke(nameof(StopWallJumping));
+        }
+        else
+        {
+            wallJumpingCounter -= Time.deltaTime;
+        }
+        if(Input.GetButtonDown("Jump") && wallJumpingCounter > 0f)
+        {
+            isWallJumping = true;
+            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
+            wallJumpingCounter = 0f;
+
+            if(transform.localScale.x != wallJumpingDirection)
+            {
+                FacingRight = !FacingRight;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
+            }
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+        }
+    }
+    private void StopWallJumping()
+    {
+        isWallJumping = false;
+    }
+
+   /* void Move(float direction)
     {
         float xVelocity = direction * speed * 100 * Time.fixedDeltaTime; //tinh van toc
         Vector2 newVelocity = new Vector2(xVelocity, rb.velocity.y);
         rb.velocity = newVelocity;
-    }
+    }*/
     void Jump()
     {
         if(isGrounded)
