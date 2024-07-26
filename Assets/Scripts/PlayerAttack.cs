@@ -3,6 +3,7 @@
 public class PlayerAttack : Health
 {
     [Header("Damage")]
+    [SerializeField] private GameObject gameOverPannel;
     // Luong sat thuong cua player khi tan cong
     [SerializeField] private int attackDamage;
     // Kich thuoc vung tan cong
@@ -142,9 +143,7 @@ public class PlayerAttack : Health
         if (enemyRb != null)
         {
             Vector2 recoilDirection = (enemy.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
-            Debug.Log("Recoil Direction: " + recoilDirection); // Kiểm tra hướng phản kháng
             enemyRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
-            Debug.Log("Applied Recoil Force: " + recoilForce); // Kiểm tra lực phản kháng
         }
     }
 
@@ -161,7 +160,7 @@ public class PlayerAttack : Health
     protected override void Die()
     {
         anim.SetTrigger("IsDead"); // Kich hoat animation chet
-        StartCoroutine(DieRoutine()); // Bat dau routine chet
+        gameOverPannel.SetActive(true);
     }
 
 }

@@ -45,11 +45,6 @@ public class MoveBetweenWaypoints : MonoBehaviour
             stopTimer = 0.0f;
             SwitchTargetWaypoint();
         }
-        else
-        {
-            // Lock the enemy's Y position during the stop
-            LockYAxisPosition();
-        }
 
         // Communicate to EnemyController that movement has stopped
         if (enemyController != null)
@@ -77,7 +72,6 @@ public class MoveBetweenWaypoints : MonoBehaviour
         if (Vector3.Distance(transform.position, targetWaypoint.position) < 0.1f)
         {
             isStopping = true;
-            originalPosition = transform.position; // Store Y position when stopping
         }
     }
 
@@ -86,9 +80,4 @@ public class MoveBetweenWaypoints : MonoBehaviour
         targetWaypoint = (targetWaypoint == waypoint1) ? waypoint2 : waypoint1;
     }
 
-    private void LockYAxisPosition()
-    {
-        // Lock Y position to prevent drifting during stop
-        transform.position = new Vector3(transform.position.x, originalPosition.y, transform.position.z);
-    }
 }

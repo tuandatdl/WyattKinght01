@@ -116,9 +116,6 @@ public abstract class EnemyController : Health
         {
             bool isRunning = speed > 0.1f; // Consider running if speed is significant
 
-            // Debugging the speed and direction
-            Debug.Log($"Speed: {speed}, Direction: {direction}, IsRunning: {isRunning}");
-
             animator.SetBool("IsRunning", isRunning); // Set Running animation
 
             // Flip the character based on direction
