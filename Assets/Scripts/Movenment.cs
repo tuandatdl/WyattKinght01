@@ -1,14 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection.Emit;
-using System.Security.Cryptography;
-using TreeEditor;
-using Unity.Burst.Intrinsics;
-using Unity.VisualScripting;
-using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
+
 
 public class Movenment : MonoBehaviour
 {
@@ -30,10 +21,10 @@ public class Movenment : MonoBehaviour
     public float doubleJumpPower = 8f; // Lực nhảy đôi
     private bool doubleJump;
 
-    private float coyotaTime = 0.2f;
+    [SerializeField] private float coyotaTime = 0.5f;
     private float coyataTimeCounter;
 
-    private float jumpBufferTime = 0.2f;
+    [SerializeField] private float jumpBufferTime = 0.6f;
     private float jumpBufferCounter;
 
     private float doubleTapTime;
@@ -69,9 +60,9 @@ public class Movenment : MonoBehaviour
       
     }
      void FixedUpdate()
-    {
+     {
         WallJump();   
-    }
+     }
 
     //kiem tra mat dat co dung voi collider khac hay ko
         //2D collider co nam trong lop mat dat ko
@@ -128,41 +119,42 @@ public class Movenment : MonoBehaviour
     }
     void Jump()
     {
-        if(isGrounded)
+        // Kiểm tra nếu đang đứng trên mặt đất
+        if (isGrounded)
         {
             coyataTimeCounter = coyotaTime;
-        }
-        else
-        {
-            coyataTimeCounter -= Time.deltaTime;
-        }
-        if(isGrounded)
-        {
             jumpBufferCounter = jumpBufferTime;
-        }
-        else
-        {
-            jumpBufferCounter -= Time.deltaTime;
-        }
-        if(isGrounded && !Input.GetButton("Jump"))
-        {
             doubleJump = false;
         }
-        if(Input.GetButtonDown("Jump")) 
+        else
         {
-            if(coyataTimeCounter > 0f && jumpBufferCounter > 0f && isGrounded || doubleJump || isWallSliding && Input.GetButtonDown("Jump"))
+            // Giảm thời gian coyota khi không đứng trên mặt đất
+            coyataTimeCounter -= Time.deltaTime;
+            jumpBufferCounter -= Time.deltaTime;
+        }
+
+        // Kiểm tra nếu nhấn nút nhảy
+        if (Input.GetButtonDown("Jump"))
+        {
+            // Kiểm tra điều kiện để thực hiện nhảy
+            if ((coyataTimeCounter > 0f && jumpBufferCounter > 0f) || doubleJump || (isWallSliding && Input.GetButtonDown("Jump")))
             {
-            rb.velocity = new Vector2(rb.velocity.x, jumpPower);
-            doubleJump = !doubleJump;
-            jumpBufferCounter = 0f;
+                // Thực hiện nhảy
+                rb.velocity = new Vector2(rb.velocity.x, jumpPower);
+                doubleJump = !doubleJump;
+                jumpBufferCounter = 0f;
             }
         }
-        if(Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+
+        // Kiểm tra nếu ngừng nhấn nút nhảy và vận tốc theo chiều y vẫn còn dương
+        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
         {
+            // Giảm vận tốc theo chiều y để tạo hiệu ứng nhảy thấp hơn
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
             coyataTimeCounter = 0f;
         }
     }
+
     void Dash()
     {
         if(side == 0)

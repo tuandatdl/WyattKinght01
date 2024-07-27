@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 5316937625051062423}
   - component: {fileID: 4089963147811747705}
   - component: {fileID: 4393555687426446286}
-  - component: {fileID: 730934264344381653}
   - component: {fileID: 5240449703290574535}
+  - component: {fileID: 1319379947400626908}
   - component: {fileID: 5706076950468566727}
   m_Layer: 8
   m_Name: Player
@@ -175,28 +175,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.011172856, y: 0.0026160716}
   m_Size: {x: 0.27318513, y: 0.26750803}
   m_Direction: 0
---- !u!114 &730934264344381653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1811081211036175054}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a23e30acdbe94ec995599047c484573, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundCheckCollider: {fileID: 5367147675486883530}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  speed: 4
-  jumpForce: 250
-  doubleJumpForce: 15
-  dashForce: 20
-  dashDuration: 0.2
-  isGrounded: 0
 --- !u!114 &5240449703290574535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,6 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _currentHealth: 0
+  gameOverPannel: {fileID: 0}
   attackDamage: 2
   attackRange: {x: 3.4, y: 2}
   attackPoint: {fileID: 5367147675486883530}
@@ -221,6 +200,32 @@ MonoBehaviour:
   playerMaxHealth: 10
   attackCooldown: 1.1
   recoilForce: 7
+--- !u!114 &1319379947400626908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811081211036175054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04f4c09cc14d2490c9bb98139aa99217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 4089963147811747705}
+  groundCheck: {fileID: 2405387168508233127}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  isGrounded: 0
+  wallJumpTime: 0.2
+  wallSlideSpeed: 0.3
+  wallDistance: 0.5
+  speed: 4
+  jumpPower: 15
+  doubleJumpPower: 8
+  dashSpeed: 30
+  startDashCount: 0.1
 --- !u!114 &5706076950468566727
 MonoBehaviour:
   m_ObjectHideFlags: 0
