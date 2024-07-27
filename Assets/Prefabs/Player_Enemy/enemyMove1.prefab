@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1757705514235015773}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.93, y: 0, z: 0}
+  m_LocalPosition: {x: 0.23, y: -0.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -57,7 +57,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 64.40567, y: 2.3173594, z: -1.7440597}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7731426199159626567}
@@ -96,8 +96,8 @@ Transform:
   m_GameObject: {fileID: 2999849873086835141}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.76, y: -1.14, z: 0.9331727}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.11, z: 0}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1806823086426272074}
@@ -144,7 +144,7 @@ SpriteRenderer:
   m_SortingLayerID: -140077395
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 563186262, guid: eb4a5dd0e4896b54bb7c58663bd0d4ee, type: 3}
+  m_Sprite: {fileID: -1313625327, guid: 3277c24f5621c5749b0f4d88ec4e2985, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -208,8 +208,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.45598412, y: -0.08383405}
-  m_Size: {x: 1.8915977, y: 2.1456506}
+  m_Offset: {x: -0.21960068, y: -0.24592102}
+  m_Size: {x: 0.9381485, y: 1.636708}
   m_Direction: 0
 --- !u!50 &1522501119728407192
 Rigidbody2D:
@@ -236,7 +236,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &7109866205501754836
 MonoBehaviour:
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _currentHealth: 0
-  attackRange: {x: 3.05, y: 2.64}
+  attackRange: {x: 2.03, y: 2.45}
   playerLayer:
     serializedVersion: 2
     m_Bits: 256

@@ -1,231 +1,228 @@
 using UnityEngine;
 
-
 public class Movenment : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private LayerMask groundLayer; // LayerMask để xác định lớp nền
-    [SerializeField] private bool isGrounded = false;
+    [SerializeField] private LayerMask groundLayer; // LayerMask de xac dinh mat dat
+    [SerializeField] private bool isGrounded = false; // Kiem tra xem nhan vat co dung tren mat dat hay khong
 
     [Header("Wall Jump")]
-    public float wallJumpTime = 0.2f;
-    public float wallSlideSpeed = 0.3f;
-    public float wallDistance = 0.5f;
-    bool isWallSliding = false;
-    RaycastHit2D WallCheckHit;
-    float jumpTime;
+    public float wallJumpTime = 0.2f; // Thoi gian co the bam tuong truoc khi nhay
+    public float wallSlideSpeed = 0.3f; // Toc do truot xuong khi bam tuong
+    public float wallDistance = 0.5f; // Khoang cach toi tuong de xac dinh viec bam tuong
+    private bool isWallSliding = false; // Kiem tra xem nhan vat co dang bam tuong hay khong
+    private RaycastHit2D wallCheckHit; // Kiem tra va cham voi tuong
+    private float jumpTime; // Thoi gian co the nhay tuong
 
-    public float speed = 5f; //Toc do
+    public float speed = 5f; // Toc do di chuyen
     public float jumpPower = 10f; // Luc nhay
-    public float doubleJumpPower = 8f; // Lực nhảy đôi
-    private bool doubleJump;
+    public float doubleJumpPower = 8f; // Luc nhay doi
+    private bool canDoubleJump = true; // Cho phep nhay doi
 
-    [SerializeField] private float coyotaTime = 0.5f;
-    private float coyataTimeCounter;
+    [SerializeField] private float coyoteTime = 0.5f; // Thoi gian co the nhay sau khi roi khoi mat dat
+    private float coyoteTimeCounter; // Bo dem thoi gian coyote
 
-    [SerializeField] private float jumpBufferTime = 0.6f;
-    private float jumpBufferCounter;
+    [SerializeField] private float jumpBufferTime = 0.6f; // Thoi gian bo dem cho viec nhay
+    private float jumpBufferCounter; // Bo dem thoi gian nhay
 
-    private float doubleTapTime;
-    private KeyCode lastKeyCode;
+    private float doubleTapTime; // Thoi gian giua 2 lan bam phim de xac dinh viec dash
+    private KeyCode lastKeyCode; // Phim vua duoc nhan
 
-    public float dashSpeed;
-    private float dashCount;
-    public float startDashCount;
-    private int side;
+    public float dashSpeed; // Toc do khi dash
+    private float dashCount; // Dem nguoc thoi gian dash
+    public float startDashCount; // Gia tri ban dau cua dem nguoc thoi gian dash
+    private int side; // Huong cua dash
 
-    private Animator anim;
-    private const float groundCheckRadius = 0.2f; // Bán kính của vòng tròn kiểm tra mặt đất
-    
-    private bool FacingRight = true;
-    private float moveInput; //Gia tri dau vao
-  
+    private Animator anim; // Bien Animator de dieu khien cac hoat anh
+    private const float groundCheckRadius = 0.2f; // Ban kinh cua vung kiem tra mat dat
+
+    private bool facingRight = true; // Xac dinh huong nhin cua nhan vat
+    private float moveInput; // Dau vao di chuyen theo truc ngang
+
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        dashCount = startDashCount;
+        rb = GetComponent<Rigidbody2D>(); // Lay thanh phan Rigidbody2D cua nhan vat
+        anim = GetComponent<Animator>(); // Lay thanh phan Animator cua nhan vat
+        dashCount = startDashCount; // Khoi tao gia tri ban dau cho dem nguoc thoi gian dash
     }
-   
+
     void Update()
     {
-       moveInput = Input.GetAxisRaw("Horizontal"); //Lay gia tri dau vao cua truc X (A/D),(</>)
-       UpdateAnimation();
-       GroundCheck();
-       Move(moveInput);
-       Jump();
-       Dash();
-       Flip();
-      
+        moveInput = Input.GetAxisRaw("Horizontal"); // Lay gia tri dau vao theo truc ngang (A/D hoac mui ten trai/phai)
+        UpdateAnimation(); // Cap nhat cac hoat anh
+        GroundCheck(); // Kiem tra mat dat
+        Move(moveInput); // Xu ly di chuyen
+        Jump(); // Xu ly nhay
+        Dash(); // Xu ly dash
+        Flip(); // Xu ly quay huong
     }
-     void FixedUpdate()
-     {
-        WallJump();   
-     }
 
-    //kiem tra mat dat co dung voi collider khac hay ko
-        //2D collider co nam trong lop mat dat ko
-        //neu co thi (isGrounded true) ko thi (isGrounded false)
+    void FixedUpdate()
+    {
+        WallJump(); // Xu ly bam tuong va nhay tuong
+    }
+
     void GroundCheck()
     {
-        // Giả sử ban đầu rằng nhân vật không chạm đất
-        if(jumpTime < Time.time)
-        {
-            isGrounded = false;
-        }
-        // sử dụng hàm Physics2D.OverlapCircleAll để kiểm tra xem có bất kỳ collider nào nằm trong vòng tròn kiểm tra mặt đất không
+        // Kiem tra xem nhan vat co dung tren mat dat hay khong
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius, groundLayer);
-        if(colliders.Length > 0)
+        isGrounded = colliders.Length > 0;
+
+        // Reset thoi gian coyote va bo dem nhay neu dang dung tren mat dat
+        if (isGrounded)
         {
-            isGrounded = true;
-        }
-    }
-   
-    void Move(float direction)
-    {
-        float xVelocity = direction * speed * 100 * Time.fixedDeltaTime; //tinh van toc
-        Vector2 newVelocity = new Vector2(xVelocity, rb.velocity.y);
-        rb.velocity = newVelocity;
-    }
-    void WallJump()
-    {
-        if(FacingRight)
-        {
-            WallCheckHit = Physics2D.Raycast(transform.position, new Vector2(wallDistance, 0), wallDistance, groundLayer);
+            coyoteTimeCounter = coyoteTime; // Dat lai bo dem thoi gian coyote
+            jumpBufferCounter = jumpBufferTime; // Dat lai bo dem thoi gian nhay
+            canDoubleJump = true; // Reset kha nang nhay doi
         }
         else
         {
-            WallCheckHit = Physics2D.Raycast(transform.position, new Vector2(-wallDistance, 0), wallDistance, groundLayer);
+            // Giam cac bo dem neu khong dung tren mat dat
+            coyoteTimeCounter -= Time.deltaTime;
+            jumpBufferCounter -= Time.deltaTime;
         }
-        if(WallCheckHit && !isGrounded && moveInput != 0)
+    }
+
+    void Move(float direction)
+    {
+        float xVelocity = direction * speed * 100 * Time.fixedDeltaTime; // Tinh van toc theo truc ngang
+        Vector2 newVelocity = new Vector2(xVelocity, rb.velocity.y); // Tao vector van toc moi
+        rb.velocity = newVelocity; // Cap nhat van toc cua Rigidbody2D
+    }
+
+    void WallJump()
+    {
+        // Kiem tra xem nhan vat co cham vao tuong hay khong
+        if (facingRight)
         {
-            isWallSliding = true;
-            jumpTime = Time.time + wallJumpTime;
+            wallCheckHit = Physics2D.Raycast(transform.position, Vector2.right, wallDistance, groundLayer); // Kiem tra va cham tuong phai
+        }
+        else
+        {
+            wallCheckHit = Physics2D.Raycast(transform.position, Vector2.left, wallDistance, groundLayer); // Kiem tra va cham tuong trai
+        }
+
+        if (wallCheckHit && !isGrounded && moveInput != 0)
+        {
+            isWallSliding = true; // Xac nhan nhan vat dang bam tuong
+            jumpTime = Time.time + wallJumpTime; // Dat thoi gian co the bam tuong
         }
         else if (jumpTime < Time.time)
         {
-            isWallSliding = false;
-        }
-        if(isWallSliding) 
-        {
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, wallSlideSpeed, float.MaxValue));
-            anim.SetBool("WallSliding", true); // Kích hoạt animation bám tường
-        }
-        else
-        {
-            anim.SetBool("WallSliding", false); // Tắt animation bám tường
-        }
-    }
-    void Jump()
-    {
-        // Kiểm tra nếu đang đứng trên mặt đất
-        if (isGrounded)
-        {
-            coyataTimeCounter = coyotaTime;
-            jumpBufferCounter = jumpBufferTime;
-            doubleJump = false;
-        }
-        else
-        {
-            // Giảm thời gian coyota khi không đứng trên mặt đất
-            coyataTimeCounter -= Time.deltaTime;
-            jumpBufferCounter -= Time.deltaTime;
+            isWallSliding = false; // Xac nhan nhan vat khong con bam tuong
         }
 
-        // Kiểm tra nếu nhấn nút nhảy
+        if (isWallSliding)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, wallSlideSpeed, float.MaxValue)); // Giam van toc khi truot tuong
+            anim.SetBool("WallSliding", true); // Bat hoat anh truot tuong
+        }
+        else
+        {
+            anim.SetBool("WallSliding", false); // Tat hoat anh truot tuong
+        }
+    }
+
+    void Jump()
+    {
+        // Xu ly nhay va nhay doi
         if (Input.GetButtonDown("Jump"))
         {
-            // Kiểm tra điều kiện để thực hiện nhảy
-            if ((coyataTimeCounter > 0f && jumpBufferCounter > 0f) || doubleJump || (isWallSliding && Input.GetButtonDown("Jump")))
+            if (coyoteTimeCounter > 0f || (isWallSliding && Input.GetButtonDown("Jump")))
             {
-                // Thực hiện nhảy
-                rb.velocity = new Vector2(rb.velocity.x, jumpPower);
-                doubleJump = !doubleJump;
-                jumpBufferCounter = 0f;
+                // Thuc hien nhay binh thuong
+                rb.velocity = new Vector2(rb.velocity.x, jumpPower); // Dat van toc theo truc Y de nhay
+                canDoubleJump = true; // Reset kha nang nhay doi khi nhay binh thuong
+                jumpBufferCounter = 0f; // Dat lai bo dem thoi gian nhay
+            }
+            else if (canDoubleJump)
+            {
+                // Thuc hien nhay doi
+                rb.velocity = new Vector2(rb.velocity.x, doubleJumpPower); // Dat van toc theo truc Y de nhay doi
+                canDoubleJump = false; // Su dung nhay doi
             }
         }
 
-        // Kiểm tra nếu ngừng nhấn nút nhảy và vận tốc theo chiều y vẫn còn dương
+        // Kiem tra viec tha nut nhay
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
         {
-            // Giảm vận tốc theo chiều y để tạo hiệu ứng nhảy thấp hơn
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-            coyataTimeCounter = 0f;
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f); // Giam van toc de tao hieu ung nhay thap hon
+            coyoteTimeCounter = 0f; // Dat lai bo dem thoi gian coyote
         }
     }
 
     void Dash()
     {
-        if(side == 0)
+        if (side == 0)
         {
-            if(Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKeyDown(KeyCode.A))
             {
-                if(doubleTapTime > Time.time && lastKeyCode == KeyCode.A)
-            {
-                side = 1;
-                anim.SetBool("Dashing", true); // Kích hoạt animation dashing
-            }
-            else
-            {
-                doubleTapTime = Time.time + 0.5f;
-            }
-            lastKeyCode = KeyCode.A;
+                if (doubleTapTime > Time.time && lastKeyCode == KeyCode.A)
+                {
+                    side = 1; // Dat huong dash sang trai
+                    anim.SetBool("Dashing", true); // Bat hoat anh dash
+                }
+                else
+                {
+                    doubleTapTime = Time.time + 0.5f; // Dat thoi gian cho lan bam phim tiep theo
+                }
+                lastKeyCode = KeyCode.A; // Luu phim vua bam
             }
             else if (Input.GetKeyDown(KeyCode.D))
             {
-                if(doubleTapTime > Time.time && lastKeyCode == KeyCode.D)
-            {
-                side = 2;
-                anim.SetBool("Dashing", true); // Kích hoạt animation dashing
-            }
-            else
-            {
-                doubleTapTime = Time.time + 0.5f;
-            }
-            lastKeyCode = KeyCode.D;
+                if (doubleTapTime > Time.time && lastKeyCode == KeyCode.D)
+                {
+                    side = 2; // Dat huong dash sang phai
+                    anim.SetBool("Dashing", true); // Bat hoat anh dash
+                }
+                else
+                {
+                    doubleTapTime = Time.time + 0.5f; // Dat thoi gian cho lan bam phim tiep theo
+                }
+                lastKeyCode = KeyCode.D; // Luu phim vua bam
             }
         }
         else
         {
-            if(dashCount <= 0)
+            if (dashCount <= 0)
             {
-                side = 0;
-                dashCount = startDashCount;
-                rb.velocity = Vector2.zero;
-                anim.SetBool("Dashing", false); // Tắt animation dashing
+                side = 0; // Khong con dash
+                dashCount = startDashCount; // Dat lai gia tri dem nguoc thoi gian dash
+                rb.velocity = Vector2.zero; // Dat van toc ve 0
+                anim.SetBool("Dashing", false); // Tat hoat anh dash
             }
             else
             {
-                dashCount -= Time.deltaTime;
+                dashCount -= Time.deltaTime; // Giam dem nguoc thoi gian dash
 
-                if(side == 1)
+                if (side == 1)
                 {
-                    rb.velocity = Vector2.left * dashSpeed;
+                    rb.velocity = Vector2.left * dashSpeed; // Dat van toc theo huong trai khi dash
                 }
-                else if(side == 2)
+                else if (side == 2)
                 {
-                    rb.velocity = Vector2.right * dashSpeed;
+                    rb.velocity = Vector2.right * dashSpeed; // Dat van toc theo huong phai khi dash
                 }
             }
         }
     }
+
     void Flip()
     {
-        if(FacingRight && moveInput < 0f || !FacingRight && moveInput > 0)
+        // Xu ly quay huong nhin cua nhan vat
+        if (facingRight && moveInput < 0f || !facingRight && moveInput > 0)
         {
-            // Đổi hướng player
-            FacingRight = !FacingRight;
-            // Lấy thang đo hiện tại của player
-            Vector3 localScale = transform.localScale;
-            localScale.x *= -1f;
-            // Lấy lại thang đo mới cho player
-            transform.localScale = localScale;
+            facingRight = !facingRight; // Thay doi huong nhin
+            Vector3 localScale = transform.localScale; // Lay ty le hien tai cua nhan vat
+            localScale.x *= -1f; // Nhan ty le theo chieu ngang voi -1 de quay nguoc
+            transform.localScale = localScale; // Cap nhat ty le cua nhan vat
         }
     }
+
     void UpdateAnimation()
     {
-         anim.SetFloat("Running", Mathf.Abs(moveInput));
-         anim.SetBool("Jumping", !isGrounded);
+        anim.SetFloat("Running", Mathf.Abs(moveInput)); // Cap nhat hoat anh chay
+        anim.SetBool("Jumping", !isGrounded); // Cap nhat hoat anh nhay
     }
 }
