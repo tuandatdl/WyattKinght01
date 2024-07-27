@@ -21,8 +21,6 @@ public class Spike : EnemyController
     // Xử lý va chạm với player
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("OnCollisionEnter2D called"); // Kiểm tra xem hàm có được gọi không
-
         // Kiểm tra xem collider có phải là player không
         if ((playerLayer & (1 << collision.gameObject.layer)) != 0)
         {

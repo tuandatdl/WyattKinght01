@@ -62,7 +62,7 @@ public abstract class Health : MonoBehaviour
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
 
         // Chờ đợi 5 giây trước khi hủy đối tượng
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(0.8f);
         Destroy(gameObject);
     }
 }

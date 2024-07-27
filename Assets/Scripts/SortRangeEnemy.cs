@@ -1,18 +1,18 @@
 using UnityEngine;
 
-public class Skeleton : EnemyController
+public class SortRangeEnemy : EnemyController
 {
     [Header("Health")]
-    [SerializeField] private int skeletonMaxHealth = 10;
+    [SerializeField] private int enemyMaxHealth = 10;
     [Space(5)]
 
     [Header("Damage")]
-    [SerializeField] private int skeletonDamage = 2;
+    [SerializeField] private int enemyDamage = 2;
 
     protected override void Start()
     {
-        MaxHealth = skeletonMaxHealth;
-        damage = skeletonDamage;
+        MaxHealth = enemyMaxHealth;
+        damage = enemyDamage;
         base.Start();
     }
 
