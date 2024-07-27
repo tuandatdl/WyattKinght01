@@ -2439,6 +2439,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5647854771662832447, guid: 6b4bb86a9367c3a42a9f488d09bb2ab9, type: 3}
   m_PrefabInstance: {fileID: 796468182}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &796468184 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8423477357372985192, guid: 6b4bb86a9367c3a42a9f488d09bb2ab9, type: 3}
+  m_PrefabInstance: {fileID: 796468182}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &809203854
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5191,7 +5196,7 @@ PrefabInstance:
     - target: {fileID: 5240449703290574535, guid: 10d43b667f499c64c92d6c422037294b, type: 3}
       propertyPath: gameOverPannel
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 796468184}
     - target: {fileID: 5240449703290574535, guid: 10d43b667f499c64c92d6c422037294b, type: 3}
       propertyPath: playerMaxHealth
       value: 10
