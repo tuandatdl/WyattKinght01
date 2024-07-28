@@ -12,9 +12,6 @@ public abstract class Health : MonoBehaviour
     // Sự kiện khi sức khỏe thay đổi
     public event Action<int, int> OnHealthChanged;
      
-    // Biến đếm số lượng vàng
-    private int goldCount = 0;
-
     // Phương thức khởi tạo, gán sức khỏe hiện tại bằng sức khỏe tối đa
     protected virtual void Start()
     {
@@ -24,7 +21,11 @@ public abstract class Health : MonoBehaviour
         }
         CurrentHealth = MaxHealth;
     }
-
+    // Phương thức để hồi máu
+    public void Heal(int health)
+    {
+        CurrentHealth += health;
+    }
     // Thuộc tính để lấy và set sức khỏe hiện tại
     public int CurrentHealth
     {
@@ -54,27 +55,6 @@ public abstract class Health : MonoBehaviour
             Die();
         }
     }
-    // Phương thức để hồi máu
-    public void Heal(int health)
-    {
-        CurrentHealth += health;
-    }
-
-    // Phương thức xử lý va chạm
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Heart"))
-        {
-            Heal(1);
-            Destroy(other.gameObject); // Xóa trái tim sau khi va chạm
-        }
-        else if (other.CompareTag("Gold"))
-        {
-            goldCount += 1;
-            Destroy(other.gameObject); // Xóa vàng sau khi va chạm
-        }
-    }
-
     // Phương thức abstract, phải được implement trong các lớp kế thừa
     protected abstract void Die();
 
