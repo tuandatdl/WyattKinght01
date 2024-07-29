@@ -147,6 +147,7 @@ MonoBehaviour:
   attackPoint: {fileID: 7807663632430639619}
   attackCooldown: 1
   recoilForce: 10
+  effectAttack1: {fileID: 8828787844202781321, guid: 4f2c73846e798564cb9dd51b6c85d073, type: 3}
   enemyMaxHealth: 6
   enemyDamage: 1
 --- !u!50 &4460662176131199485

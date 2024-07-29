@@ -7,6 +7,14 @@ public class Movenment : MonoBehaviour
     [SerializeField] private LayerMask groundLayer; // LayerMask de xac dinh mat dat
     [SerializeField] private bool isGrounded = false; // Kiem tra xem nhan vat co dung tren mat dat hay khong
 
+    [SerializeField] private AudioSource audioSource; // AudioSource component
+    [SerializeField] private AudioClip moveSound; // Âm thanh di chuyển
+    [SerializeField] private AudioClip jumpSound; // Âm thanh nhảy
+    [SerializeField] private AudioClip dashSound; // Âm thanh dash
+    [SerializeField] private float moveVolume = 0.5f; // Âm lượng di chuyển
+    [SerializeField] private float jumpVolume = 0.5f; // Âm lượng nhảy
+    [SerializeField] private float dashVolume = 0.5f; // Âm lượng dash
+
     [Header("Wall Jump")]
     public float wallJumpTime = 0.2f; // Thoi gian co the bam tuong truoc khi nhay
     public float wallSlideSpeed = 0.3f; // Toc do truot xuong khi bam tuong
@@ -33,6 +41,9 @@ public class Movenment : MonoBehaviour
     private float dashCount; // Dem nguoc thoi gian dash
     public float startDashCount; // Gia tri ban dau cua dem nguoc thoi gian dash
     private int side; // Huong cua dash
+
+    [SerializeField] private GameObject effectDash;
+    [SerializeField] private GameObject effectJump;
 
     private Animator anim; // Bien Animator de dieu khien cac hoat anh
     private const float groundCheckRadius = 0.2f; // Ban kinh cua vung kiem tra mat dat
@@ -89,6 +100,14 @@ public class Movenment : MonoBehaviour
         float xVelocity = direction * speed * 100 * Time.fixedDeltaTime; // Tinh van toc theo truc ngang
         Vector2 newVelocity = new Vector2(xVelocity, rb.velocity.y); // Tao vector van toc moi
         rb.velocity = newVelocity; // Cap nhat van toc cua Rigidbody2D
+        
+        // Phát âm thanh di chuyển
+        if (direction != 0 && !audioSource.isPlaying)
+        {
+            audioSource.clip = moveSound;
+            audioSource.volume = moveVolume;
+            audioSource.Play();
+        }
     }
 
     void WallJump()
@@ -135,12 +154,24 @@ public class Movenment : MonoBehaviour
                 rb.velocity = new Vector2(rb.velocity.x, jumpPower); // Dat van toc theo truc Y de nhay
                 canDoubleJump = true; // Reset kha nang nhay doi khi nhay binh thuong
                 jumpBufferCounter = 0f; // Dat lai bo dem thoi gian nhay
+                DashJump();
+
+                // Phát âm thanh nhảy
+                audioSource.clip = jumpSound;
+                audioSource.volume = jumpVolume;
+                audioSource.Play();
             }
             else if (canDoubleJump)
             {
                 // Thuc hien nhay doi
                 rb.velocity = new Vector2(rb.velocity.x, doubleJumpPower); // Dat van toc theo truc Y de nhay doi
                 canDoubleJump = false; // Su dung nhay doi
+                DashJump();
+
+                // Phát âm thanh nhảy đôi
+                audioSource.clip = jumpSound;
+                audioSource.volume = jumpVolume;
+                audioSource.Play();
             }
         }
 
@@ -162,6 +193,12 @@ public class Movenment : MonoBehaviour
                 {
                     side = 1; // Dat huong dash sang trai
                     anim.SetBool("Dashing", true); // Bat hoat anh dash
+                    DashEffect();
+
+                    // Phát âm thanh dash
+                    audioSource.clip = dashSound;
+                    audioSource.volume = dashVolume;
+                    audioSource.Play();
                 }
                 else
                 {
@@ -175,6 +212,12 @@ public class Movenment : MonoBehaviour
                 {
                     side = 2; // Dat huong dash sang phai
                     anim.SetBool("Dashing", true); // Bat hoat anh dash
+                    DashEffect();
+                    
+                    // Phát âm thanh dash
+                    audioSource.clip = dashSound;
+                    audioSource.volume = dashVolume;
+                    audioSource.Play();
                 }
                 else
                 {
@@ -205,6 +248,33 @@ public class Movenment : MonoBehaviour
                     rb.velocity = Vector2.right * dashSpeed; // Dat van toc theo huong phai khi dash
                 }
             }
+        }
+        
+    }
+    private void DashEffect()
+    {
+        GameObject effect = Instantiate(effectDash, transform.position, Quaternion.identity); // Tao hieu ung tan cong
+        RotateEffect(effect); // Xoay hieu ung theo huong cua player
+    }
+    private void DashJump()
+    {
+        GameObject effect = Instantiate(effectJump, transform.position, Quaternion.identity); // Tao hieu ung tan cong
+        RotateEffect(effect); // Xoay hieu ung theo huong cua player
+    }
+
+    // Ham xoay hieu ung de phu hop voi huong cua player
+    private void RotateEffect(GameObject effect)
+    {
+        Vector3 playerDirection = transform.localScale; // Lay huong cua player
+
+        // Neu player quay sang trai, flip hieu ung
+        if (playerDirection.x < 0)
+        {
+            effect.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            effect.transform.localScale = new Vector3(1, 1, 1);
         }
     }
 

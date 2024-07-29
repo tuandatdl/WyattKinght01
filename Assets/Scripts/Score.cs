@@ -1,46 +1,52 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Score : MonoBehaviour
+public class ScoreManager : MonoBehaviour
 {
-    // Biến đếm số lượng vàng
-    private int goldCount = 0;
-    
-    // Phương thức xử lý va chạm
-    private void OnTriggerEnter2D(Collider2D other)
+    public Text scoreText;    // UI Text để hiển thị điểm
+    public GameObject[] coins;  // Mảng các đối tượng coin
+    public GameObject[] hearts; // Mảng các đối tượng heart
+
+    private int goldCount = 0;    // Biến đếm số lượng vàng
+
+    [SerializeField] protected GameObject effecfItem;
+
+    // Tham chiếu đến đối tượng Health của người chơi
+    private PlayerAttack playerAttack;
+
+
+    private void Start()
     {
-        Debug.Log("Triggered with: " + other.tag);
-        if (other.CompareTag("Gold"))
-        {
-            Debug.Log("Gold tag detected.");
-            AddGold(1); // Cập nhật giá trị goldCount
-            Debug.Log("Gold collected. Current gold count: " + goldCount);
-            Destroy(other.gameObject); // Xóa vàng sau khi va chạm
-        }
-        else if (other.CompareTag("Health"))
-        {
-            Heal(1); // Cộng 1 đơn vị máu hoặc điều chỉnh tùy ý
-            Debug.Log("Health collected.");
-            Destroy(other.gameObject); // Xóa máu sau khi va chạm
-        }
+        playerAttack = FindObjectOfType<PlayerAttack>();
+        UpdateScoreUI();
     }
 
-    // Phương thức cộng máu
-    public void Heal(int health)
+    private void UpdateScoreUI()
     {
-        // Gọi phương thức Heal trong script Health
-        GetComponent<Health>().Heal(health);
+        scoreText.text = " " + goldCount.ToString();
+        
     }
 
-    // Phương thức cộng tiền
     public void AddGold(int gold)
     {
         goldCount += gold;
+        UpdateScoreUI();
     }
 
-    // Phương thức lấy số lượng vàng
-    public string GetGoldCount()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        return goldCount.ToString();
+        if (other.CompareTag("Gold"))
+        {
+            AddGold(1);
+            GameObject effect = Instantiate(effecfItem, transform.position, Quaternion.identity);
+            Destroy(other.gameObject);
+        }
+        else if (other.CompareTag("Health"))
+        {
+            playerAttack.Heal(2); // Tăng máu cho người chơi khi nhặt heart
+            GameObject effect = Instantiate(effecfItem, transform.position, Quaternion.identity);
+            Destroy(other.gameObject); // Xóa heart sau khi va chạm
+            
+        }
     }
 }

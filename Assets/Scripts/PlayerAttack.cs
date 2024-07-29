@@ -31,14 +31,26 @@ public class PlayerAttack : Health
     // Luong luc phan khuc khi tan cong
     [SerializeField] private float recoilForce = 5f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip attackSound; // Âm thanh tấn công
+    [SerializeField] private AudioClip hurtSound;   // Âm thanh bị đánh
+    [SerializeField] private AudioClip gameOverSound; // Âm thanh game over
+    [SerializeField] private float attackSoundVolume = 0.5f; // Âm lượng tấn công
+    [SerializeField] private float hurtSoundVolume = 0.5f;   // Âm lượng bị đánh
+    [SerializeField] private float gameOverSoundVolume = 0.5f; // Âm lượng game over
+
     private Rigidbody2D rb;
     private Animator anim;
+    private AudioSource audioSource; // Thêm AudioSource để phát âm thanh
+    private AudioManager audioManager; // Tham chiếu đến AudioManager
 
     // Khoi tao cac component
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>(); // Lấy AudioSource từ đối tượng
+        audioManager = AudioManager.instance; // Lấy instance của AudioManager
     }
 
     // Khoi tao suc khoe va start base
@@ -102,11 +114,14 @@ public class PlayerAttack : Health
         }
         anim.SetTrigger("Attacking"); // Kích hoạt animation tấn công của player
         AttackEffect(); // Tạo hiệu ứng tấn công
+
+        // Phát âm thanh tấn công
+        PlaySound(attackSound, attackSoundVolume);
     }
     public override void TakeDamage(int damage)
     {
-        Debug.Log("Player taking damage"); // Kiểm tra xem hàm có được gọi không
         CurrentHealth -= damage;
+        PlaySound(hurtSound, hurtSoundVolume); // Phát âm thanh bị đánh
         // Nếu sức khỏe hiện tại <= 0, gọi hàm chết
         if (CurrentHealth <= 0)
         {
@@ -140,18 +155,25 @@ public class PlayerAttack : Health
     private void ApplyRecoilForce(Collider2D enemy)
     {
         Rigidbody2D enemyRb = enemy.GetComponent<Rigidbody2D>();
-        if (enemyRb != null)
+        
+        Vector2 recoilDirection = (enemy.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
+        enemyRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
+        
+    }
+
+    private void PlaySound(AudioClip clip, float volume)
+    {
+        if (clip != null && audioSource != null)
         {
-            Vector2 recoilDirection = (enemy.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
-            enemyRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
+            audioSource.clip = clip;
+            audioSource.volume = volume;
+            audioSource.Play();
         }
     }
 
     // Ve gizmo cho vung tan cong trong editor
     private void OnDrawGizmos()
     {
-        if (attackPoint == null) return; // Neu attackPoint la null, thoat ra
-
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(attackPoint.position, attackRange); // Ve vung tan cong
     }
@@ -161,6 +183,14 @@ public class PlayerAttack : Health
     {
         anim.SetTrigger("IsDead"); // Kich hoat animation chet
         gameOverPannel.SetActive(true);
+        PlaySound(gameOverSound, gameOverSoundVolume); // Phát âm thanh game over
+        
+        if (audioManager != null)
+        {
+            // Tắt nhạc nền
+            audioManager.GetComponent<AudioSource>().Stop();
+        }
+        
+        StartCoroutine(DieRoutine());
     }
-
 }

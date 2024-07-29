@@ -50,14 +50,14 @@ TagManager:
   - name: MidGround
     uniqueID: 470313893
     locked: 0
-  - name: Player
-    uniqueID: 1406806451
-    locked: 0
   - name: Win
     uniqueID: 932271861
     locked: 0
   - name: Enemy
     uniqueID: 4154889901
+    locked: 0
+  - name: Player
+    uniqueID: 1406806451
     locked: 0
   - name: Effect
     uniqueID: 2989116965

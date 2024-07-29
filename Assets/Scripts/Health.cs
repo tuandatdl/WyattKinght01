@@ -49,6 +49,7 @@ public abstract class Health : MonoBehaviour
     public virtual void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
+
         // Nếu sức khỏe hiện tại <= 0, gọi hàm chết
         if (CurrentHealth <= 0)
         {
