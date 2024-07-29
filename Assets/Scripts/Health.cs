@@ -11,13 +11,21 @@ public abstract class Health : MonoBehaviour
 
     // Sự kiện khi sức khỏe thay đổi
     public event Action<int, int> OnHealthChanged;
-
+     
     // Phương thức khởi tạo, gán sức khỏe hiện tại bằng sức khỏe tối đa
     protected virtual void Start()
     {
+         if (MaxHealth <= 0)
+        {
+            MaxHealth = 100; // Giá trị mặc định nếu MaxHealth chưa được thiết lập
+        }
         CurrentHealth = MaxHealth;
     }
-
+    // Phương thức để hồi máu
+    public void Heal(int health)
+    {
+        CurrentHealth += health;
+    }
     // Thuộc tính để lấy và set sức khỏe hiện tại
     public int CurrentHealth
     {
@@ -41,13 +49,13 @@ public abstract class Health : MonoBehaviour
     public virtual void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
+
         // Nếu sức khỏe hiện tại <= 0, gọi hàm chết
         if (CurrentHealth <= 0)
         {
             Die();
         }
     }
-
     // Phương thức abstract, phải được implement trong các lớp kế thừa
     protected abstract void Die();
 
@@ -61,7 +69,7 @@ public abstract class Health : MonoBehaviour
         // Chuyển đối tượng thành Static, không bị ảnh hưởng bởi lực
         GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
 
-        // Chờ đợi 5 giây trước khi hủy đối tượng
+        // Chờ đợi 0.8 giây trước khi hủy đối tượng
         yield return new WaitForSeconds(0.8f);
         Destroy(gameObject);
     }

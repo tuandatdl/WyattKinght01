@@ -234,8 +234,9 @@ MonoBehaviour:
   attackPoint: {fileID: 6635420431659315598}
   attackCooldown: 1
   recoilForce: 10
-  skeletonMaxHealth: 6
-  skeletonDamage: 1
+  effectAttack1: {fileID: 8828787844202781321, guid: 4f2c73846e798564cb9dd51b6c85d073, type: 3}
+  enemyMaxHealth: 10
+  enemyDamage: 2
 --- !u!114 &6727776358648587394
 MonoBehaviour:
   m_ObjectHideFlags: 0

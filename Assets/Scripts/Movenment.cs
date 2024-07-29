@@ -34,6 +34,9 @@ public class Movenment : MonoBehaviour
     public float startDashCount; // Gia tri ban dau cua dem nguoc thoi gian dash
     private int side; // Huong cua dash
 
+    [SerializeField] private GameObject effectDash;
+    [SerializeField] private GameObject effectJump;
+
     private Animator anim; // Bien Animator de dieu khien cac hoat anh
     private const float groundCheckRadius = 0.2f; // Ban kinh cua vung kiem tra mat dat
 
@@ -135,12 +138,14 @@ public class Movenment : MonoBehaviour
                 rb.velocity = new Vector2(rb.velocity.x, jumpPower); // Dat van toc theo truc Y de nhay
                 canDoubleJump = true; // Reset kha nang nhay doi khi nhay binh thuong
                 jumpBufferCounter = 0f; // Dat lai bo dem thoi gian nhay
+                DashJump();
             }
             else if (canDoubleJump)
             {
                 // Thuc hien nhay doi
                 rb.velocity = new Vector2(rb.velocity.x, doubleJumpPower); // Dat van toc theo truc Y de nhay doi
                 canDoubleJump = false; // Su dung nhay doi
+                DashJump();
             }
         }
 
@@ -162,6 +167,7 @@ public class Movenment : MonoBehaviour
                 {
                     side = 1; // Dat huong dash sang trai
                     anim.SetBool("Dashing", true); // Bat hoat anh dash
+                    DashEffect();
                 }
                 else
                 {
@@ -175,6 +181,7 @@ public class Movenment : MonoBehaviour
                 {
                     side = 2; // Dat huong dash sang phai
                     anim.SetBool("Dashing", true); // Bat hoat anh dash
+                    DashEffect();
                 }
                 else
                 {
@@ -205,6 +212,33 @@ public class Movenment : MonoBehaviour
                     rb.velocity = Vector2.right * dashSpeed; // Dat van toc theo huong phai khi dash
                 }
             }
+        }
+        
+    }
+    private void DashEffect()
+    {
+        GameObject effect = Instantiate(effectDash, transform.position, Quaternion.identity); // Tao hieu ung tan cong
+        RotateEffect(effect); // Xoay hieu ung theo huong cua player
+    }
+    private void DashJump()
+    {
+        GameObject effect = Instantiate(effectJump, transform.position, Quaternion.identity); // Tao hieu ung tan cong
+        RotateEffect(effect); // Xoay hieu ung theo huong cua player
+    }
+
+    // Ham xoay hieu ung de phu hop voi huong cua player
+    private void RotateEffect(GameObject effect)
+    {
+        Vector3 playerDirection = transform.localScale; // Lay huong cua player
+
+        // Neu player quay sang trai, flip hieu ung
+        if (playerDirection.x < 0)
+        {
+            effect.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            effect.transform.localScale = new Vector3(1, 1, 1);
         }
     }
 

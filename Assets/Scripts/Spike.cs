@@ -17,6 +17,10 @@ public class Spike : EnemyController
     {
         // Spike không bị ảnh hưởng bởi sát thương, do đó không làm gì ở đây
     }
+    protected override void ApplyDamageToPlayer(PlayerAttack playerAttack)
+    {
+
+    }
 
     // Xử lý va chạm với player
     private void OnCollisionEnter2D(Collision2D collision)
@@ -31,18 +35,14 @@ public class Spike : EnemyController
 
                 // Áp dụng lực phản kháng lên player
                 Rigidbody2D playerRb = collision.collider.GetComponent<Rigidbody2D>();
-                if (playerRb != null)
-                {
-                    Vector2 recoilDirection = (collision.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
-                    playerRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
-                }
+                Vector2 recoilDirection = (collision.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
+                playerRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
+                
 
                 // Kích hoạt animation "Hurting" của player
                 Animator playerAnim = playerAttack.GetComponent<Animator>(); // Lấy component Animator từ player
-                if (playerAnim != null)
-                {
-                    playerAnim.SetTrigger("Hurting"); // Kích hoạt animation bị tấn công
-                }
+                playerAnim.SetTrigger("Hurting"); // Kích hoạt animation bị tấn công
+                
             }
         }
     }

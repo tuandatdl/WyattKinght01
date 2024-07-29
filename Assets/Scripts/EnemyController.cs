@@ -17,6 +17,7 @@ public abstract class EnemyController : Health
     [Header("Recoil")]
     [SerializeField] protected float recoilForce = 10f;
 
+    [SerializeField] protected GameObject effectAttack1;
     protected Animator animator;
     private Rigidbody2D rb;
 
@@ -80,6 +81,29 @@ public abstract class EnemyController : Health
         if (playerAnim != null)
         {
             playerAnim.SetTrigger("Hurting");
+        }
+
+        AttackEffect();
+    }
+    private void AttackEffect()
+    {
+        GameObject effect = Instantiate(effectAttack1, transform.position, Quaternion.identity); // Tao hieu ung tan cong
+        RotateEffect(effect); // Xoay hieu ung theo huong cua player
+    }
+
+    // Ham xoay hieu ung de phu hop voi huong cua player
+    private void RotateEffect(GameObject effect)
+    {
+        Vector3 playerDirection = transform.localScale; // Lay huong cua player
+
+        // Neu player quay sang trai, flip hieu ung
+        if (playerDirection.x < 0)
+        {
+            effect.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            effect.transform.localScale = new Vector3(1, 1, 1);
         }
     }
 

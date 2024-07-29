@@ -105,7 +105,6 @@ public class PlayerAttack : Health
     }
     public override void TakeDamage(int damage)
     {
-        Debug.Log("Player taking damage"); // Kiểm tra xem hàm có được gọi không
         CurrentHealth -= damage;
         // Nếu sức khỏe hiện tại <= 0, gọi hàm chết
         if (CurrentHealth <= 0)
@@ -140,18 +139,15 @@ public class PlayerAttack : Health
     private void ApplyRecoilForce(Collider2D enemy)
     {
         Rigidbody2D enemyRb = enemy.GetComponent<Rigidbody2D>();
-        if (enemyRb != null)
-        {
-            Vector2 recoilDirection = (enemy.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
-            enemyRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
-        }
+        
+        Vector2 recoilDirection = (enemy.transform.position - transform.position).normalized; // Tính toán hướng phản kháng
+        enemyRb.AddForce(recoilDirection * recoilForce, ForceMode2D.Impulse); // Áp dụng lực phản kháng
+        
     }
 
     // Ve gizmo cho vung tan cong trong editor
     private void OnDrawGizmos()
     {
-        if (attackPoint == null) return; // Neu attackPoint la null, thoat ra
-
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(attackPoint.position, attackRange); // Ve vung tan cong
     }
